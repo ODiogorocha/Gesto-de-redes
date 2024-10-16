@@ -4,13 +4,15 @@ import json
 import socket
 import struct
 from datetime import datetime
+import tkinter as tk
+from tkinter import scrolledtext, messagebox
+import threading
 
 # Função para descobrir dispositivos na rede
 def descobrir_dispositivos(rede="192.168.0.0/24"):  
     scanner_nmap = nmap.PortScanner()
     print(f"Escaneando a rede {rede}...")
 
-    # Scaneia a rede com o argumento '-sn' (ping scan)
     try:
         scanner_nmap.scan(hosts=rede, arguments='-sn')  
     except Exception as e:
@@ -74,20 +76,17 @@ def detectar_mudancas(dispositivos_atualizados, dispositivos_antigos):
     novos_dispositivos = [dispositivo for dispositivo in dispositivos_atualizados if dispositivo not in dispositivos_antigos]
     dispositivos_offline = [dispositivo for dispositivo in dispositivos_antigos if dispositivo not in dispositivos_atualizados]
 
-    if novos_dispositivos:
-        print("\nNovos dispositivos detectados:")
-        exibir_dispositivos(novos_dispositivos)
+    return novos_dispositivos, dispositivos_offline
 
-    if dispositivos_offline:
-        print("\nDispositivos offline:")
-        exibir_dispositivos(dispositivos_offline)
-
-# Exibir lista de dispositivos descobertos
-def exibir_dispositivos(dispositivos):
+# Exibir lista de dispositivos descobertos na interface
+def exibir_dispositivos_na_interface(dispositivos):
+    area_texto.delete(1.0, tk.END)  # Limpa o texto anterior
     for dispositivo in dispositivos:
-        print(f"IP: {dispositivo['ip']}, MAC: {dispositivo['mac']}, Fabricante: {dispositivo['fabricante']}, Primeira Descoberta: {dispositivo['primeira_descoberta']}")
+        area_texto.insert(tk.END, f"IP: {dispositivo['ip']}, MAC: {dispositivo['mac']}, "
+                                    f"Fabricante: {dispositivo['fabricante']}, "
+                                    f"Primeira Descoberta: {dispositivo['primeira_descoberta']}\n")
 
-# Coordena o programa
+# Coordena o programa de monitoramento
 def executar_monitoramento():
     # Carrega histórico de descobertas anteriores
     historico_dispositivos = carregar_historico()
@@ -106,9 +105,18 @@ def executar_monitoramento():
 
             # Detecta mudança de histórico
             if historico_dispositivos:
-                detectar_mudancas(dispositivos_atualizados, historico_dispositivos)
+                novos_dispositivos, dispositivos_offline = detectar_mudancas(dispositivos_atualizados, historico_dispositivos)
 
-            exibir_dispositivos(dispositivos_atualizados)
+                if novos_dispositivos:
+                    print("\nNovos dispositivos detectados:")
+                    exibir_dispositivos_na_interface(novos_dispositivos)
+
+                if dispositivos_offline:
+                    print("\nDispositivos offline:")
+                    exibir_dispositivos_na_interface(dispositivos_offline)
+
+            # Exibe dispositivos na interface
+            exibir_dispositivos_na_interface(dispositivos_atualizados)
 
             # Atualiza o histórico e salva no arquivo
             historico_dispositivos = dispositivos_atualizados
@@ -120,5 +128,20 @@ def executar_monitoramento():
     except KeyboardInterrupt:
         print("\nExecução interrompida pelo usuário.")
 
-if __name__ == "__main__":
-    executar_monitoramento()
+# Função para iniciar o monitoramento em uma thread separada
+def iniciar_monitoramento():
+    threading.Thread(target=executar_monitoramento, daemon=True).start()
+
+# Criação da interface gráfica
+root = tk.Tk()
+root.title("Scanner de Rede")
+
+# Botão para iniciar o monitoramento
+botao_monitoramento = tk.Button(root, text="Iniciar Monitoramento", command=iniciar_monitoramento)
+botao_monitoramento.pack(pady=10)
+
+# Área de texto para exibir os dispositivos encontrados
+area_texto = scrolledtext.ScrolledText(root, width=80, height=20)
+area_texto.pack(pady=10)
+
+root.mainloop()
