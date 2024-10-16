@@ -22,25 +22,28 @@ def descobrir_dispositivos(rede="192.168.0.0/24"):
     dispositivos_encontrados = []
     for host in scanner_nmap.all_hosts():
         print(f"Dispositivo encontrado: {host}")  
-        if 'mac' in scanner_nmap[host]['addresses']: 
-            dispositivo = {
-                "ip": host,
-                "mac": scanner_nmap[host]['addresses']['mac'],
-                "fabricante": scanner_nmap[host]['vendor'].get(scanner_nmap[host]['addresses']['mac'], "Desconhecido"),
-                "primeira_descoberta": datetime.now().strftime("%Y-%m-%d %H:%M:%S")     
-            }
-            dispositivos_encontrados.append(dispositivo)
+        dispositivo = {
+            "ip": host,
+            "mac": scanner_nmap[host]['addresses'].get('mac', 'Desconhecido'),
+            "fabricante": scanner_nmap[host]['vendor'].get(scanner_nmap[host]['addresses'].get('mac', ''), "Desconhecido"),
+            "primeira_descoberta": datetime.now().strftime("%Y-%m-%d %H:%M:%S")     
+        }
+        dispositivos_encontrados.append(dispositivo)
     print(f"Dispositivos encontrados nesta varredura: {dispositivos_encontrados}")  
     return dispositivos_encontrados
 
 # Função para obter o gateway padrão (roteador) da rede
 def obter_gateway():
-    with open("/proc/net/route") as arquivo_rotas:
-        for linha in arquivo_rotas:
-            campos = linha.strip().split()  
-            if campos[1] != '00000000' or not int(campos[3], 16) & 2:
-                continue
-            return socket.inet_ntoa(struct.pack("<L", int(campos[2], 16)))
+    try:
+        with open("/proc/net/route") as arquivo_rotas:
+            for linha in arquivo_rotas:
+                campos = linha.strip().split()  
+                if campos[1] != '00000000' or not int(campos[3], 16) & 2:
+                    continue
+                return socket.inet_ntoa(struct.pack("<L", int(campos[2], 16)))
+    except Exception as e:
+        print(f"Erro ao obter gateway: {e}")
+        return None
 
 # Classificar dispositivos entre roteador e host
 def classificar_dispositivos(dispositivos, ip_gateway):
@@ -69,6 +72,10 @@ def carregar_historico(arquivo_historico="historico.json"):
         with open(arquivo_historico, 'r') as arquivo:
             return json.load(arquivo)
     except FileNotFoundError:
+        print("Arquivo de histórico não encontrado, criando novo.")
+        return []
+    except json.JSONDecodeError:
+        print("Erro ao decodificar JSON. Criando um novo arquivo.")
         return []
 
 # Detectar dispositivos novos e offline
@@ -79,12 +86,17 @@ def detectar_mudancas(dispositivos_atualizados, dispositivos_antigos):
     return novos_dispositivos, dispositivos_offline
 
 # Exibir lista de dispositivos descobertos na interface
-def exibir_dispositivos_na_interface(dispositivos):
-    area_texto.delete(1.0, tk.END)  # Limpa o texto anterior
-    for dispositivo in dispositivos:
-        area_texto.insert(tk.END, f"IP: {dispositivo['ip']}, MAC: {dispositivo['mac']}, "
-                                    f"Fabricante: {dispositivo['fabricante']}, "
-                                    f"Primeira Descoberta: {dispositivo['primeira_descoberta']}\n")
+def exibir_dispositivos_na_interface(dispositivos, titulo="Dispositivos Descobertos"):
+    if not dispositivos:
+        area_texto.insert(tk.END, f"{titulo}: Nenhum dispositivo encontrado.\n")
+    else:
+        area_texto.insert(tk.END, f"{titulo}:\n")
+        for dispositivo in dispositivos:
+            area_texto.insert(tk.END, f"IP: {dispositivo['ip']}, MAC: {dispositivo['mac']}, "
+                                        f"Fabricante: {dispositivo['fabricante']}, "
+                                        f"Primeira Descoberta: {dispositivo['primeira_descoberta']}\n")
+    area_texto.insert(tk.END, "\n")  # Adiciona uma linha vazia para separar os grupos
+    area_texto.yview(tk.END)  # Move a barra de rolagem para o final
 
 # Coordena o programa de monitoramento
 def executar_monitoramento():
@@ -93,6 +105,9 @@ def executar_monitoramento():
 
     # Obtém o gateway (roteador) de rede
     gateway = obter_gateway()
+    if not gateway:
+        print("Gateway não encontrado. Encerrando.")
+        return
     print(f"Gateway (roteador) da rede: {gateway}")
 
     try:
@@ -109,14 +124,14 @@ def executar_monitoramento():
 
                 if novos_dispositivos:
                     print("\nNovos dispositivos detectados:")
-                    exibir_dispositivos_na_interface(novos_dispositivos)
+                    exibir_dispositivos_na_interface(novos_dispositivos, titulo="Novos Dispositivos")
 
                 if dispositivos_offline:
                     print("\nDispositivos offline:")
-                    exibir_dispositivos_na_interface(dispositivos_offline)
+                    exibir_dispositivos_na_interface(dispositivos_offline, titulo="Dispositivos Offline")
 
-            # Exibe dispositivos na interface
-            exibir_dispositivos_na_interface(dispositivos_atualizados)
+            # Exibe todos os dispositivos atualizados na interface
+            exibir_dispositivos_na_interface(dispositivos_atualizados, titulo="Todos os Dispositivos Atuais")
 
             # Atualiza o histórico e salva no arquivo
             historico_dispositivos = dispositivos_atualizados
@@ -132,6 +147,10 @@ def executar_monitoramento():
 def iniciar_monitoramento():
     threading.Thread(target=executar_monitoramento, daemon=True).start()
 
+# Função para fechar o programa
+def fechar_programa():
+    root.quit()
+
 # Criação da interface gráfica
 root = tk.Tk()
 root.title("Scanner de Rede")
@@ -139,6 +158,10 @@ root.title("Scanner de Rede")
 # Botão para iniciar o monitoramento
 botao_monitoramento = tk.Button(root, text="Iniciar Monitoramento", command=iniciar_monitoramento)
 botao_monitoramento.pack(pady=10)
+
+# Botão para fechar o programa
+botao_fechar = tk.Button(root, text="Fechar Programa", command=fechar_programa)
+botao_fechar.pack(pady=10)
 
 # Área de texto para exibir os dispositivos encontrados
 area_texto = scrolledtext.ScrolledText(root, width=80, height=20)
