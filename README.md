@@ -1,135 +1,115 @@
-Aqui está um exemplo de README voltado para a matéria de **Gestão de Redes** do curso de **Sistemas de Informação**. Esse README está estruturado para o primeiro trabalho da disciplina, focado em uma ferramenta de descoberta de dispositivos de rede.
 
----
+# 🚀 Ferramenta de Monitoramento de Rede - Gestão de Redes
 
-# Gestão de Redes - Sistemas de Informação
+Bem-vindo ao repositório do projeto de **Gestão de Redes** desenvolvido para o curso de **Sistemas de Informação** da **Universidade Federal de Santa Maria (UFSM)**. Este projeto faz parte de uma série de trabalhos práticos voltados para o gerenciamento eficiente de redes, com foco na descoberta de dispositivos, monitoramento em tempo real e análise de mudanças em redes locais.
 
-Este repositório contém os trabalhos desenvolvidos ao longo da disciplina de **Gestão de Redes** no curso de **Sistemas de Informação** da **Universidade Federal de Santa Maria (UFSM)**. A disciplina explora conceitos e práticas de redes de computadores, com ênfase na gestão e monitoramento de redes.
+## 📋 Visão Geral
 
-## Trabalho 1: Ferramenta de Descoberta de Dispositivos na Rede
+Este projeto implementa uma **ferramenta de descoberta de dispositivos** na rede local, com funcionalidades avançadas que permitem o monitoramento contínuo e detalhado dos dispositivos conectados. Além disso, ele mantém um histórico dos dispositivos e destaca mudanças na rede, como a adição de novos dispositivos ou a desconexão de dispositivos existentes.
 
-O primeiro trabalho consiste no desenvolvimento de uma ferramenta capaz de realizar a descoberta de dispositivos em uma rede local. A ferramenta deve manter um histórico das varreduras, registrar novos dispositivos e dispositivos que ficaram offline, além de exibir informações detalhadas como IP, MAC, fabricante e horário da descoberta.
+### Funcionalidades Principais:
 
-### Objetivos do Trabalho
+- 🔍 **Descoberta de Dispositivos**: Identifica todos os dispositivos ativos na rede, exibindo informações como endereço IP, endereço MAC e fabricante.
+- 💾 **Histórico de Varreduras**: Armazena os resultados de varreduras anteriores, permitindo detectar mudanças na rede.
+- ⚡ **Detecção de Mudanças**: Monitora novos dispositivos conectados e identifica dispositivos que se desconectaram.
+- 🏷️ **Classificação de Dispositivos**: Diferencia entre **roteador** e **hosts**.
+- 📅 **Primeira Descoberta**: Registra o horário da primeira descoberta de cada dispositivo.
 
-- **Descobrir dispositivos** conectados à rede local.
-- **Classificar dispositivos** entre roteador e hosts.
-- **Registrar histórico** de varreduras, armazenando mudanças como novos dispositivos e dispositivos offline.
-- **Utilizar Python** e a biblioteca Nmap para realizar o escaneamento de rede.
+## 🎯 Objetivo do Projeto
 
-### Requisitos
+O principal objetivo deste projeto é oferecer uma solução prática e modular para monitoramento de redes locais, permitindo que administradores de rede e estudantes da área identifiquem de maneira eficiente a presença e a atividade de dispositivos conectados. Esta ferramenta também oferece insights em tempo real sobre mudanças e eventos de rede, ajudando a garantir o controle e a segurança do ambiente.
 
-- Linguagem de Programação: **Python**
-- Bibliotecas Utilizadas: 
-  - `python-nmap` para realizar os scans de rede.
-  - `json` para manipulação do histórico.
-  - Outras bibliotecas nativas do Python (`socket`, `struct`, `datetime`).
+## 🔧 Tecnologias Utilizadas
 
-### Estrutura do Projeto
+- **Python**: Linguagem de programação principal.
+- **Nmap**: Ferramenta de código aberto para descoberta de rede e auditoria de segurança.
+- **Bibliotecas**:
+  - `python-nmap`: Para integração com o Nmap.
+  - `json`: Para armazenar e manipular o histórico de dispositivos.
+  - `socket`, `struct`: Para obtenção do gateway da rede.
+  - `datetime`: Para registrar o horário da descoberta.
 
-```text
-.
-├── monitoramento_rede.py  # Código principal para monitoramento de rede
-├── historico.json         # Arquivo gerado automaticamente para salvar histórico de dispositivos
-└── README.md              # Arquivo de documentação do projeto
-```
+## 🚀 Como Usar
 
-### Funcionalidades
+### Pré-requisitos:
 
-1. **Descoberta de Dispositivos**:
-   - Utiliza o `Nmap` para escanear a rede e listar os dispositivos conectados.
-   - Exibe informações de IP, MAC, fabricante e o horário da primeira descoberta.
+- **Instale o Nmap** no seu sistema:
+  ```bash
+  sudo apt install nmap
+  ```
+- **Instale as dependências Python**:
+  ```bash
+  pip install python-nmap
+  ```
 
-2. **Classificação de Dispositivos**:
-   - Identifica o roteador (gateway da rede) e o diferencia dos outros dispositivos (hosts).
+### Executando a Ferramenta:
 
-3. **Histórico de Dispositivos**:
-   - Mantém um histórico de todos os dispositivos descobertos, salvando-o em um arquivo JSON.
-   - Detecta novos dispositivos e aqueles que ficaram offline ao longo do tempo.
-
-4. **Relatórios de Mudanças**:
-   - Informa sempre que houver um novo dispositivo ou quando algum dispositivo desconectar-se da rede.
-
-### Como Executar
-
-1. **Instalação do Nmap**:
-
-   Certifique-se de que o Nmap está instalado no seu sistema:
-
+1. Clone o repositório:
    ```bash
-   sudo apt install nmap  # No Ubuntu
+   git clone https://github.com/seuusuario/rede-monitoramento.git
+   cd rede-monitoramento
    ```
 
-2. **Instalação das Dependências**:
-
-   Execute o seguinte comando para instalar a biblioteca `python-nmap`:
-
-   ```bash
-   pip install python-nmap
-   ```
-
-3. **Execução do Monitoramento**:
-
-   Após clonar o repositório, execute o script principal:
-
+2. Execute o script principal:
    ```bash
    python monitoramento_rede.py
    ```
 
-   O script irá escanear a rede local e exibir os dispositivos encontrados. Ele continuará rodando, repetindo o escaneamento a cada 60 segundos.
+3. O programa irá escanear a rede local e exibir informações sobre os dispositivos conectados, atualizando a cada 60 segundos. 
 
-### Exemplo de Saída
+### Exemplo de Saída:
 
 ```bash
 Escaneando a rede 192.168.1.0/24...
 Gateway (roteador) da rede: 192.168.1.1
 Novos dispositivos detectados:
-IP: 192.168.1.5, MAC: AA:BB:CC:DD:EE:FF, FABRICANTE: Desconhecido, PRIMEIRA DESCOBERTA: 2024-10-16 10:30:00
+IP: 192.168.1.10, MAC: AA:BB:CC:DD:EE:FF, FABRICANTE: Apple, PRIMEIRA DESCOBERTA: 2024-10-16 12:30:00
 Dispositivos offline:
-IP: 192.168.1.10, MAC: 11:22:33:44:55:66, FABRICANTE: XYZ Corp, PRIMEIRA DESCOBERTA: 2024-10-16 09:25:00
+IP: 192.168.1.5, MAC: 11:22:33:44:55:66, FABRICANTE: Samsung, PRIMEIRA DESCOBERTA: 2024-10-16 11:25:00
 ```
 
-### Estrutura de Dados
+## 🌐 Estrutura de Arquivos
 
-O histórico é salvo no arquivo `historico.json`, que contém a seguinte estrutura:
-
-```json
-[
-  {
-    "ip": "192.168.1.5",
-    "mac": "AA:BB:CC:DD:EE:FF",
-    "fabricante": "Desconhecido",
-    "primeira_descoberta": "2024-10-16 10:30:00",
-    "tipo": "Host"
-  },
-  ...
-]
+```text
+.
+├── monitoramento_rede.py  # Código principal da ferramenta
+├── historico.json         # Histórico de dispositivos descobertos (gerado automaticamente)
+└── README.md              # Documentação do projeto
 ```
 
-## Proposta da Disciplina
+## 🛠️ Funcionalidades Técnicas
 
-Ao longo da disciplina de **Gestão de Redes**, diversos trabalhos práticos serão desenvolvidos para entender e aplicar conceitos de gerenciamento e monitoramento de redes. O objetivo é familiarizar os alunos com as ferramentas e práticas utilizadas no gerenciamento de redes, preparando-os para enfrentar desafios reais no mercado de trabalho.
+1. **Descoberta e Exibição de Dispositivos**:
+   - Através do Nmap, a ferramenta escaneia a rede e identifica dispositivos.
+   - Exibe informações detalhadas como IP, MAC e fabricante.
 
-Este repositório será atualizado com os próximos trabalhos à medida que a disciplina avançar.
+2. **Histórico de Mudanças na Rede**:
+   - Armazena as informações de cada varredura em um arquivo JSON.
+   - Detecta novos dispositivos e aqueles que se desconectaram, informando as mudanças em tempo real.
 
-## Como Contribuir
+3. **Classificação entre Roteador e Hosts**:
+   - O gateway (roteador) é automaticamente identificado e diferenciado dos demais dispositivos.
 
-Contribuições para melhorias são bem-vindas! Para enviar sugestões ou correções:
+4. **Monitoramento Contínuo**:
+   - A ferramenta roda em loop, repetindo o escaneamento a cada minuto, garantindo que a rede seja constantemente monitorada.
 
-1. Faça um **fork** deste repositório.
-2. Crie uma **branch** com a sua modificação (`git checkout -b minha-modificacao`).
-3. Realize suas mudanças e faça o **commit** (`git commit -m 'Descrição das mudanças'`).
-4. Envie as mudanças para o seu **fork** (`git push origin minha-modificacao`).
-5. Abra um **Pull Request** para este repositório.
+## 📈 Benefícios
 
----
+- **Visibilidade em Tempo Real**: Monitore sua rede com atualizações a cada 60 segundos.
+- **Segurança**: Identifique rapidamente novos dispositivos que se conectam à sua rede.
+- **Modularidade**: A ferramenta pode ser adaptada para outros trabalhos e funcionalidades no futuro.
+- **Histórico de Atividades**: Mantenha um registro detalhado de todos os dispositivos que já foram conectados à rede.
 
-**Professor:** Carlos Raniery P. dos Santos  
-**Disciplina:** Gestão de Redes  
-**Departamento:** Computação Aplicada, Centro de Tecnologia - UFSM
+## 💡 Próximos Passos
 
-**Aluno(s):** Nome(s) do(s) aluno(s) do grupo
+Este projeto é a base para trabalhos futuros na disciplina de Gestão de Redes, onde mais funcionalidades serão adicionadas, como:
 
----
+- Monitoramento de tráfego em tempo real.
+- Detecção de possíveis intrusões.
+- Análises de performance da rede.
 
-Esse README proporciona uma explicação completa para o primeiro trabalho da disciplina, apresentando objetivos, estrutura do projeto, requisitos e como executá-lo.
+## 📚 Sobre a Disciplina
+
+A disciplina de **Gestão de Redes** faz parte da grade curricular do curso de **Sistemas de Informação** da UFSM, focando no desenvolvimento de habilidades práticas para monitoramento, configuração e manutenção de redes de computadores.
+
+**Departamento:** Computação Aplicada - Centro de Tecnologia - UFSM
