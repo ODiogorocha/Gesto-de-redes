@@ -1,3 +1,4 @@
+#importacao  de bibliotecas necessarias 
 import nmap
 import time
 import json
@@ -8,7 +9,7 @@ import tkinter as tk
 from tkinter import scrolledtext, messagebox
 import threading
 
-# Função para descobrir dispositivos na rede
+# Funcao para descobrir dispositivos na rede
 def descobrir_dispositivos(rede="192.168.0.0/24"):  
     scanner_nmap = nmap.PortScanner()
     print(f"Escaneando a rede {rede}...")
@@ -21,18 +22,33 @@ def descobrir_dispositivos(rede="192.168.0.0/24"):
 
     dispositivos_encontrados = []
     for host in scanner_nmap.all_hosts():
-        print(f"Dispositivo encontrado: {host}")  
+        # Obter o nome do dispositivo via DNS reverso
+        try:
+            nome_dispositivo = socket.gethostbyaddr(host)[0]  # DNS reverso para obter o nome
+        except socket.herror:
+            nome_dispositivo = "Desconhecido"  # Caso não consiga obter o nome via DNS
+
+        # Obter o endereço MAC e o fabricante
+        mac_address = scanner_nmap[host]['addresses'].get('mac', 'Desconhecido')
+        fabricante = scanner_nmap[host]['vendor'].get(mac_address, 'Desconhecido')
+
         dispositivo = {
             "ip": host,
-            "mac": scanner_nmap[host]['addresses'].get('mac', 'Desconhecido'),
-            "fabricante": scanner_nmap[host]['vendor'].get(scanner_nmap[host]['addresses'].get('mac', ''), "Desconhecido"),
-            "primeira_descoberta": datetime.now().strftime("%Y-%m-%d %H:%M:%S")     
+            "nome": nome_dispositivo,
+            "mac": mac_address,
+            "fabricante": fabricante,
+            "primeira_descoberta": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
+
         dispositivos_encontrados.append(dispositivo)
+
+        # Exibir informações no terminal
+        print(f"Dispositivo encontrado: IP: {host}, Nome: {nome_dispositivo}, MAC: {mac_address}, Fabricante: {fabricante}")
+
     print(f"Dispositivos encontrados nesta varredura: {dispositivos_encontrados}")  
     return dispositivos_encontrados
 
-# Função para obter o gateway padrão (roteador) da rede
+# Funcao para obter o gateway padrão (roteador) da rede
 def obter_gateway():
     try:
         with open("/proc/net/route") as arquivo_rotas:
@@ -92,7 +108,7 @@ def exibir_dispositivos_na_interface(dispositivos, titulo="Dispositivos Descober
     else:
         area_texto.insert(tk.END, f"{titulo}:\n")
         for dispositivo in dispositivos:
-            area_texto.insert(tk.END, f"IP: {dispositivo['ip']}, MAC: {dispositivo['mac']}, "
+            area_texto.insert(tk.END, f"IP: {dispositivo['ip']}, Nome: {dispositivo['nome']}, MAC: {dispositivo['mac']}, "
                                         f"Fabricante: {dispositivo['fabricante']}, "
                                         f"Primeira Descoberta: {dispositivo['primeira_descoberta']}\n")
     area_texto.insert(tk.END, "\n")  # Adiciona uma linha vazia para separar os grupos
@@ -143,11 +159,11 @@ def executar_monitoramento():
     except KeyboardInterrupt:
         print("\nExecução interrompida pelo usuário.")
 
-# Função para iniciar o monitoramento em uma thread separada
+# Funcao para iniciar o monitoramento em uma thread separada
 def iniciar_monitoramento():
     threading.Thread(target=executar_monitoramento, daemon=True).start()
 
-# Função para fechar o programa
+# Funcao para fechar o programa
 def fechar_programa():
     root.quit()
 
