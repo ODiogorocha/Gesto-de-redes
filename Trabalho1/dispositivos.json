@@ -1,0 +1,20 @@
+[
+    {
+        "ip": "192.168.0.1",
+        "mac": "Desconhecido",
+        "fabricante": "Desconhecido",
+        "primeira_descoberta": "2024-10-23 10:26:45"
+    },
+    {
+        "ip": "192.168.0.121",
+        "mac": "Desconhecido",
+        "fabricante": "Desconhecido",
+        "primeira_descoberta": "2024-10-23 10:26:45"
+    },
+    {
+        "ip": "192.168.0.38",
+        "mac": "Desconhecido",
+        "fabricante": "Desconhecido",
+        "primeira_descoberta": "2024-10-23 10:26:45"
+    }
+]

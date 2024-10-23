@@ -7,20 +7,27 @@ import tkinter as tk
 from tkinter import scrolledtext
 from tkinter import messagebox
 import os
+import pandas as pd
 
-# Função para carregar a lista de fabricantes OUI a partir do arquivo "mac-vendedor.txt"
-def carregar_lista_fabricantes(arquivo_oui="/home/diogo/Documents/Aulas/G.r/mac-vendedor.txt"):
+# Função para carregar a lista de fabricantes OUI a partir do arquivo "mac.txt"
+def carregar_lista_fabricantes(arquivo_oui="/home/diogo/Documents/Aulas/G.redes/Gestao-de-redes/Trabalho1/mac.txt"):
     lista_fabricantes = {}
-    try:
-        with open(arquivo_oui, 'r') as arquivo:
-            for linha in arquivo:
-                partes = linha.strip().split(maxsplit=1)
-                if len(partes) == 2:
-                    oui, fabricante = partes
-                    lista_fabricantes[oui.upper()] = fabricante
-        print(f"Lista de fabricantes carregada com sucesso. Total: {len(lista_fabricantes)}")
-    except FileNotFoundError:
-        print("Arquivo de fabricantes OUI não encontrado.")
+    
+    # Verifica se o arquivo existe antes de tentar abri-lo
+    if os.path.isfile(arquivo_oui):
+        try:
+            with open(arquivo_oui, 'r') as arquivo:
+                for linha in arquivo:
+                    partes = linha.strip().split(maxsplit=1)
+                    if len(partes) == 2:
+                        oui, fabricante = partes
+                        lista_fabricantes[oui.upper()] = fabricante
+            print(f"Lista de fabricantes carregada com sucesso. Total: {len(lista_fabricantes)}")
+        except Exception as e:
+            print(f"Erro ao carregar o arquivo de fabricantes OUI: {e}")
+    else:
+        print(f"Arquivo {arquivo_oui} não encontrado.")
+    
     return lista_fabricantes
 
 # Função para obter o fabricante a partir do MAC Address
@@ -92,7 +99,7 @@ def exibir_dispositivos(dispositivos, texto):
 
 # Função para executar a varredura de rede
 def executar_varredura(texto):
-    lista_fabricantes = carregar_lista_fabricantes("/home/diogo/Documents/Aulas/G.r/mac-vendedor.txt")  # Caminho absoluto
+    lista_fabricantes = carregar_lista_fabricantes('./mac.txt')  # Caminho do arquivo
     rede_local = obter_rede_local()
     dispositivos = descobrir_dispositivos(rede=rede_local, lista_fabricantes=lista_fabricantes)
     exibir_dispositivos(dispositivos, texto)
@@ -102,10 +109,11 @@ def executar_varredura(texto):
 # Função para parar a varredura (aqui, apenas fecha a aplicação)
 def finalizar_varredura():
     if messagebox.askokcancel("Finalizar", "Você deseja finalizar a varredura?"):
-        exit()
+        janela.destroy()  # Fechar a janela
 
 # Interface gráfica principal
 def iniciar_interface():
+    global janela
     janela = tk.Tk()
     janela.title("Scanner de Rede")
 
