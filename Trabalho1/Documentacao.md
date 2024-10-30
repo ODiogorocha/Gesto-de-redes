@@ -1,6 +1,4 @@
-Aqui está a documentação do seu código em estilo Markdown, seguindo o modelo que você forneceu:
 
-```markdown
 # Documentação do Scanner de Rede
 
 ## Visão Geral
