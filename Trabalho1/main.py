@@ -30,7 +30,7 @@ def carregar_lista_fabricantes(arquivo_oui="mac.txt"):
     
     return lista_fabricantes
 
-# Função para obter o fabricante a partir do MAC Address
+# Função para obter o fabricante a partir do MAC 
 def obter_fabricante_por_mac(mac, lista_fabricantes):
     oui = mac[:8].upper()
     return lista_fabricantes.get(oui, "Desconhecido")
@@ -41,7 +41,7 @@ def descobrir_dispositivos(rede="192.168.0.0/24", lista_fabricantes={}):
     print(f"Escaneando a rede {rede}...")
 
     try:
-        scanner_nmap.scan(hosts=rede, arguments='-sn')  # -sn para fazer um ping scan
+        scanner_nmap.scan(hosts=rede, arguments='-sn')  # -sn faz um ping scan
     except Exception as e:
         print(f"Erro ao escanear a rede: {e}")
         return []
@@ -55,7 +55,7 @@ def descobrir_dispositivos(rede="192.168.0.0/24", lista_fabricantes={}):
             "ip": host,
             "mac": mac,
             "fabricante": fabricante,
-            "status": status,  # Adicionando status do dispositivo
+            "status": status,  
             "primeira_descoberta": datetime.now().strftime("%Y-%m-%d %H:%M:%S")     
         }
         dispositivos_encontrados.append(dispositivo)
@@ -116,50 +116,42 @@ def exibir_dispositivos(dispositivos, texto):
         texto.insert(tk.END, f"IP: {dispositivo['ip']}\n")
         texto.insert(tk.END, f"MAC: {dispositivo['mac']}\n")
         texto.insert(tk.END, f"Fabricante: {dispositivo['fabricante']}\n")
-        texto.insert(tk.END, f"Status: {dispositivo['status']}\n")  # Exibindo status do dispositivo
+        texto.insert(tk.END, f"Status: {dispositivo['status']}\n") 
         texto.insert(tk.END, f"Primeira descoberta: {dispositivo['primeira_descoberta']}\n")
         texto.insert(tk.END, "-"*40 + "\n")
 
-# Função para executar a varredura de rede
 def executar_varredura(texto):
-    lista_fabricantes = carregar_lista_fabricantes('./mac.txt')  # Caminho do arquivo
+    lista_fabricantes = carregar_lista_fabricantes('./mac.txt') 
     rede_local = obter_rede_local()
     dispositivos = descobrir_dispositivos(rede=rede_local, lista_fabricantes=lista_fabricantes)
     
-    # Carregar o histórico e atualizar
     historico = carregar_historico()
     dispositivos_historico = atualizar_historico(dispositivos, historico)
 
-    # Exibir dispositivos (incluindo histórico)
     exibir_dispositivos(dispositivos_historico, texto)
     salvar_em_json(dispositivos_historico)
     messagebox.showinfo("Varredura Concluída", "Varredura finalizada e dados salvos em dispositivos.json")
 
-# Função para parar a varredura
 def finalizar_varredura():
     if messagebox.askokcancel("Finalizar", "Você deseja finalizar a varredura?"):
         janela.destroy()
 
-# Interface gráfica principal
 def iniciar_interface():
     global janela
     janela = tk.Tk()
     janela.title("Scanner de Rede")
 
-    # Campo de texto com scroll
     texto = scrolledtext.ScrolledText(janela, width=60, height=20)
     texto.pack(padx=10, pady=10)
 
-    # Botão para iniciar a varredura
     botao_iniciar = tk.Button(janela, text="Iniciar Varredura", command=lambda: threading.Thread(target=executar_varredura, args=(texto,)).start())
     botao_iniciar.pack(pady=10)
 
-    # Botão para finalizar a varredura
     botao_finalizar = tk.Button(janela, text="Finalizar", command=finalizar_varredura)
     botao_finalizar.pack(pady=10)
 
     janela.mainloop()
 
-# Iniciar a interface gráfica
+
 if __name__ == "__main__":
     iniciar_interface()

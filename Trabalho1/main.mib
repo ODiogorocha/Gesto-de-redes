@@ -1,108 +1,136 @@
-MINHA-REDE-MIB DEFINITIONS ::= BEGIN
----- Comandos para instalar e verificar a MIB:
+DISCOVERY-MIB DEFINITIONS ::= BEGIN C
 
--- 1. Copiar o arquivo main.mib para o diretório de MIBs:
---    sudo cp main.mib /usr/share/snmp/mibs/
+-- 1.sudo cp main.mib /usr/share/snmp/mibs/
 
--- 2. Verificar a estrutura da MIB:
---    snmptranslate -m +main -Tp
+-- 2. snmptranslate -m +main -Tp
 
--- 3. Consultar objetos da MIB em um dispositivo SNMP:
---    snmpwalk -v2c -c public -m +main <endereço_ip_do_dispositivo> objetosMinhaRede
+-- 3. snmpwalk -v2c -c public -m +main <endereço_ip_do_dispositivo> objetosMinhaRede
 
--- Importação de Módulos Necessários
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Integer32, IpAddress, enterprises
-        FROM SNMPv2-SMI;
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Counter32, TimeTicks, experimental
+        FROM SNMPv2-SMI
+    OBJECT-GROUP
+        FROM SNMPv2-CONF;
 
--- Definição do Módulo
-moduloMinhaRede MODULE-IDENTITY
+discoveryModule MODULE-IDENTITY
     LAST-UPDATED "202410300000Z"
-    ORGANIZATION "Minha Empresa de Tecnologia"
+    ORGANIZATION "Departamento de Computacao Aplicada - UFSM"
     CONTACT-INFO
-        "Contato: Suporte Técnico
-         E-mail: suporte@gmail.com
-         Telefone: +55 99 999999
+        "Diogo Rocha
+         Centro de Tecnologia - UFSM"
     DESCRIPTION
-        "MIB para monitoramento básico de dispositivos em uma rede local."
-    ::= { enterprises 99999 }
+        "MIB para monitoramento e configuracao de uma ferramenta de autodescoberta."
+    ::= { experimental 888 }
 
--- Raiz dos Objetos na MIB
-objetosMinhaRede OBJECT IDENTIFIER ::= { moduloMinhaRede 1 }
+discoveryObjects OBJECT IDENTIFIER ::= { discoveryModule 1 }
 
--- Objeto 1: Status do Dispositivo
-statusDispositivo OBJECT-TYPE
-    SYNTAX      INTEGER { ativo(1), inativo(2), manutencao(3) }
-    MAX-ACCESS  read-only
+-- Objetos de informações gerais do sistema
+
+systemStatus OBJECT-TYPE
+    SYNTAX      INTEGER { ativo(1), inativo(2) }
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Status atual do dispositivo. Valores possíveis:
-         - ativo (1): Dispositivo está online.
-         - inativo (2): Dispositivo está offline.
-         - manutencao (3): Dispositivo em manutenção."
-    ::= { objetosMinhaRede 1 }
+        "Status atual da ferramenta de autodescoberta."
+    ::= { discoveryObjects 1 }
 
--- Objeto 2: Contagem de Pacotes Recebidos
-contagemPacotesRecebidos OBJECT-TYPE
+discoveryInterval OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Intervalo de tempo em que a ferramenta realiza a autodescoberta."
+    ::= { discoveryObjects 2 }
+
+totalDevicesDiscovered OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Número de pacotes recebidos pelo dispositivo desde o último reinício."
-    ::= { objetosMinhaRede 2 }
+        "Contagem total de dispositivos descobertos pelo sistema."
+    ::= { discoveryObjects 3 }
 
--- Objeto 3: Contagem de Pacotes Enviados
-contagemPacotesEnviados OBJECT-TYPE
-    SYNTAX      Counter32
-    MAX-ACCESS  read-only
+adminContact OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..255))
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Número de pacotes enviados pelo dispositivo desde o último reinício."
-    ::= { objetosMinhaRede 3 }
+        "Informacao de contato do administrador responsavel pela ferramenta de autodescoberta."
+    ::= { discoveryObjects 4 }
 
--- Objeto 4: Nome do Dispositivo
-nomeDispositivo OBJECT-TYPE
+-- Tabela de informações de dispositivos descobertos
+
+discoveredDevicesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DiscoveredDeviceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Tabela contendo informacoes dos dispositivos descobertos pela ferramenta."
+    ::= { discoveryObjects 5 }
+
+discoveredDeviceEntry OBJECT-TYPE
+    SYNTAX      DiscoveredDeviceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entrada contendo informacoes de cada dispositivo descoberto."
+    INDEX       { deviceIp }
+    ::= { discoveredDevicesTable 1 }
+
+DiscoveredDeviceEntry ::= SEQUENCE {
+    deviceIp                IpAddress,
+    deviceName              OCTET STRING,
+    deviceStatus            INTEGER,
+    deviceUptime            TimeTicks
+}
+
+deviceIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Endereco IP do dispositivo descoberto."
+    ::= { discoveredDeviceEntry 1 }
+
+deviceName OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE (0..255))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Nome de identificação do dispositivo na rede."
-    ::= { objetosMinhaRede 4 }
+        "Nome do dispositivo descoberto."
+    ::= { discoveredDeviceEntry 2 }
 
--- Objeto 5: Endereço IP do Dispositivo
-enderecoIPDispositivo OBJECT-TYPE
-    SYNTAX      IpAddress
+deviceStatus OBJECT-TYPE
+    SYNTAX      INTEGER { online(1), offline(2) }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Endereço IP do dispositivo."
-    ::= { objetosMinhaRede 5 }
+        "Status atual do dispositivo descoberto."
+    ::= { discoveredDeviceEntry 3 }
 
--- Objeto 6: Nível de Carga da CPU (em %)
-cargaCPU OBJECT-TYPE
-    SYNTAX      Gauge32
+deviceUptime OBJECT-TYPE
+    SYNTAX      TimeTicks
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Nível atual de carga da CPU do dispositivo, expresso em porcentagem."
-    ::= { objetosMinhaRede 6 }
+        "Tempo em que o dispositivo descoberto esta ativo, desde o ultimo reinicio."
+    ::= { discoveredDeviceEntry 4 }
 
--- Objeto 7: Temperatura do Dispositivo (em °C)
-temperaturaDispositivo OBJECT-TYPE
-    SYNTAX      Gauge32
-    MAX-ACCESS  read-only
+-- Grupo de objetos para facilitar a visualização e controle da tabela
+
+discoveryGroup OBJECT-GROUP
+    OBJECTS { 
+        systemStatus,
+        discoveryInterval,
+        totalDevicesDiscovered,
+        adminContact,
+        deviceName,
+        deviceStatus,
+        deviceUptime
+    }
     STATUS      current
     DESCRIPTION
-        "Temperatura atual do dispositivo, medida em graus Celsius."
-    ::= { objetosMinhaRede 7 }
-
--- Objeto 8: Tempo de Atividade do Dispositivo (em segundos)
-tempoAtividadeDispositivo OBJECT-TYPE
-    SYNTAX      Integer32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Tempo total de atividade do dispositivo desde o último reinício, em segundos."
-    ::= { objetosMinhaRede 8 }
+        "Grupo de objetos para a ferramenta de autodescoberta."
+    ::= { discoveryModule 2 }
 
 END
