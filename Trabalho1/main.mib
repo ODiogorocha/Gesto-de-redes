@@ -1,4 +1,14 @@
 MINHA-REDE-MIB DEFINITIONS ::= BEGIN
+---- Comandos para instalar e verificar a MIB:
+
+-- 1. Copiar o arquivo main.mib para o diretório de MIBs:
+--    sudo cp main.mib /usr/share/snmp/mibs/
+
+-- 2. Verificar a estrutura da MIB:
+--    snmptranslate -m +main -Tp
+
+-- 3. Consultar objetos da MIB em um dispositivo SNMP:
+--    snmpwalk -v2c -c public -m +main <endereço_ip_do_dispositivo> objetosMinhaRede
 
 -- Importação de Módulos Necessários
 IMPORTS
@@ -11,8 +21,8 @@ moduloMinhaRede MODULE-IDENTITY
     ORGANIZATION "Minha Empresa de Tecnologia"
     CONTACT-INFO
         "Contato: Suporte Técnico
-         E-mail: suporte@minhaempresa.com
-         Telefone: +55 11 1234-5678"
+         E-mail: suporte@gmail.com
+         Telefone: +55 99 999999
     DESCRIPTION
         "MIB para monitoramento básico de dispositivos em uma rede local."
     ::= { enterprises 99999 }
