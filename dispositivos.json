@@ -1,0 +1,30 @@
+[
+    {
+        "ip": "192.168.0.1",
+        "mac": "Desconhecido",
+        "fabricante": "Desconhecido",
+        "status": "Offline",
+        "primeira_descoberta": "2024-10-30 12:02:24"
+    },
+    {
+        "ip": "192.168.0.121",
+        "mac": "Desconhecido",
+        "fabricante": "Desconhecido",
+        "status": "Offline",
+        "primeira_descoberta": "2024-10-30 12:02:24"
+    },
+    {
+        "ip": "192.168.0.38",
+        "mac": "Desconhecido",
+        "fabricante": "Desconhecido",
+        "status": "Offline",
+        "primeira_descoberta": "2024-10-30 12:02:24"
+    },
+    {
+        "ip": "192.168.0.78",
+        "mac": "Desconhecido",
+        "fabricante": "Desconhecido",
+        "status": "Offline",
+        "primeira_descoberta": "2024-10-30 12:02:24"
+    }
+]
