@@ -52,6 +52,41 @@
             margin: 5px 0;
         }
 
+        .estado {
+            background-color: #FF9800;
+            color: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .estado h3 {
+            font-size: 24px;
+        }
+
+        .estado p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .tabela {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        .tabela th, .tabela td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .tabela th {
+            background-color: #4CAF50;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -59,8 +94,19 @@
         <h1>Dispositivos Descobertos na Rede</h1>
     </header>
 
+    <div class="estado">
+        <h3>Estado da Ferramenta</h3>
+        <p>Status do Sistema: {{ estado_ferramenta.status_sistema }}</p>
+        <p>Intervalo de Descoberta: {{ estado_ferramenta.intervalo_descoberta }} ms</p>
+        <p>Total de Dispositivos Descobertos: {{ estado_ferramenta.total_dispositivos_descobertos }}</p>
+        <p>Contato do Administrador: <a href="mailto:{{ estado_ferramenta.contato_admin }}">{{ estado_ferramenta.contato_admin }}</a></p>
+    </div>
+    <div align="center">
+        <h2>Dispositivos Descobertos (JSON)</h2>
+    </div>
     <div class="container">
-        {% for dispositivo in dispositivos %}
+        <br>
+        {% for dispositivo in dispositivos_json %}
         <div class="dispositivo">
             <h3>{{ dispositivo.ip }}</h3>
             <p>MAC: {{ dispositivo.mac }}</p>
@@ -69,6 +115,38 @@
             <p>Primeira Descoberta: {{ dispositivo.primeira_descoberta }}</p>
         </div>
         {% endfor %}
+    </div>
+
+    <div class="container">
+        <h2>Dispositivos Descobertos (SNMP)</h2>
+        {% for dispositivo in dispositivos_snmp %}
+        <div class="dispositivo">
+            <h3>{{ dispositivo.ip }}</h3>
+            <p>Nome: {{ dispositivo.nome }}</p>
+            <p>Status: {{ dispositivo.status }}</p>
+            <p>Uptime: {{ dispositivo.uptime }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="container">
+        <h2>Dispositivos SNMP em Tabela</h2>
+        <table class="tabela">
+            <tr>
+                <th>IP</th>
+                <th>Nome</th>
+                <th>Status</th>
+                <th>Uptime</th>
+            </tr>
+            {% for dispositivo in dispositivos_snmp %}
+            <tr>
+                <td>{{ dispositivo.ip }}</td>
+                <td>{{ dispositivo.nome }}</td>
+                <td>{{ dispositivo.status }}</td>
+                <td>{{ dispositivo.uptime }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 </body>
 </html>

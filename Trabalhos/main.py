@@ -86,6 +86,13 @@ def executar_varredura():
     dispositivos = descobrir_dispositivos(rede=rede_local, lista_fabricantes=lista_fabricantes)
     salvar_em_json(dispositivos)
     print("Varredura concluída. Dados salvos em dispositivos.json.")
+    return dispositivos  # Retorna a lista de dispositivos para ser usada posteriormente
+
+# Função que retorna o total de dispositivos descobertos
+def total_dispositivos(dispositivos):
+    return len(dispositivos)
 
 if __name__ == "__main__":
-    executar_varredura()
+    dispositivos = executar_varredura()  # Realiza a varredura e obtém os dispositivos
+    total = total_dispositivos(dispositivos)  # Conta o total de dispositivos descobertos
+    print(f"Total de dispositivos descobertos: {total}")

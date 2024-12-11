@@ -1,12 +1,11 @@
-# agente_snmp.py
 from pysnmp.hlapi import *
-from main import carregar_lista_fabricantes, descobrir_dispositivos, obter_rede_local
+from main import carregar_lista_fabricantes, descobrir_dispositivos, obter_rede_local, total_dispositivos
 
 # Estado inicial da ferramenta
 estado_ferramenta = {
     "status_sistema": 1,
     "intervalo_descoberta": 60000,
-    "total_dispositivos_descobertos": 0,
+    "total_dispositivos_descobertos": 0,  # Inicialmente como 0
     "contato_admin": "admin@exemplo.com"
 }
 
@@ -19,6 +18,9 @@ def atualizar_dispositivos():
     lista_fabricantes = carregar_lista_fabricantes('./mac.txt')
     rede_local = obter_rede_local()
     dispositivos_descobertos = descobrir_dispositivos(rede=rede_local, lista_fabricantes=lista_fabricantes)
+    
+    # Atualiza o total de dispositivos descobertos após a descoberta
+    estado_ferramenta["total_dispositivos_descobertos"] = total_dispositivos(dispositivos_descobertos)
 
 # Função para criar e configurar o agente SNMP
 def configurar_agente_snmp():
@@ -57,5 +59,5 @@ def configurar_agente_snmp():
     snmp_engine.transportDispatcher.runDispatcher()
 
 if __name__ == "__main__":
-    atualizar_dispositivos()
-    configurar_agente_snmp()
+    atualizar_dispositivos()  # Atualiza a lista de dispositivos e o total
+    configurar_agente_snmp()  # Inicia o agente SNMP
