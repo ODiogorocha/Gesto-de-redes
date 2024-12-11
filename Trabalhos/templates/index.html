@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispositivos Descobertos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .dispositivo {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 200px;
+            text-align: center;
+            font-size: 18px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .dispositivo:hover {
+            transform: scale(1.05);
+        }
+
+        .dispositivo h3 {
+            font-size: 20px;
+        }
+
+        .dispositivo p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Dispositivos Descobertos na Rede</h1>
+    </header>
+
+    <div class="container">
+        {% for dispositivo in dispositivos %}
+        <div class="dispositivo">
+            <h3>{{ dispositivo.ip }}</h3>
+            <p>MAC: {{ dispositivo.mac }}</p>
+            <p>Fabricante: {{ dispositivo.fabricante }}</p>
+            <p>Status: {{ dispositivo.status }}</p>
+            <p>Primeira Descoberta: {{ dispositivo.primeira_descoberta }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

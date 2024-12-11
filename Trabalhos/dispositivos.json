@@ -1,51 +1,37 @@
 [
     {
-        "ip": "192.168.0.1",
+        "ip": "192.168.4.1",
         "mac": "Desconhecido",
         "fabricante": "Desconhecido",
-        "status": "Offline",
-        "primeira_descoberta": "2024-11-01 10:05:53"
+        "status": "Online",
+        "primeira_descoberta": "2024-12-11 14:57:37"
     },
     {
-        "ip": "192.168.0.121",
+        "ip": "192.168.4.11",
         "mac": "Desconhecido",
         "fabricante": "Desconhecido",
-        "status": "Offline",
-        "primeira_descoberta": "2024-11-01 10:05:53"
+        "status": "Online",
+        "primeira_descoberta": "2024-12-11 14:57:37"
     },
     {
-        "ip": "192.168.0.38",
+        "ip": "192.168.4.27",
         "mac": "Desconhecido",
         "fabricante": "Desconhecido",
-        "status": "Offline",
-        "primeira_descoberta": "2024-11-01 10:05:53"
+        "status": "Online",
+        "primeira_descoberta": "2024-12-11 14:57:37"
     },
     {
-        "ip": "192.168.0.78",
+        "ip": "192.168.4.31",
         "mac": "Desconhecido",
         "fabricante": "Desconhecido",
-        "status": "Offline",
-        "primeira_descoberta": "2024-10-30 11:53:45"
+        "status": "Online",
+        "primeira_descoberta": "2024-12-11 14:57:37"
     },
     {
-        "ip": "192.168.0.14",
+        "ip": "192.168.4.45",
         "mac": "Desconhecido",
         "fabricante": "Desconhecido",
-        "status": "Offline",
-        "primeira_descoberta": "2024-11-01 10:05:53"
-    },
-    {
-        "ip": "172.20.10.1",
-        "mac": "Desconhecido",
-        "fabricante": "Desconhecido",
-        "status": "Offline",
-        "primeira_descoberta": "2024-11-01 11:38:02"
-    },
-    {
-        "ip": "172.20.10.2",
-        "mac": "Desconhecido",
-        "fabricante": "Desconhecido",
-        "status": "Offline",
-        "primeira_descoberta": "2024-11-01 11:38:02"
+        "status": "Online",
+        "primeira_descoberta": "2024-12-11 14:57:37"
     }
 ]

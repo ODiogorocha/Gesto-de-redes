@@ -1,5 +1,6 @@
-from snmp_agent import SnmpAgent, MIBEntry
-from main import carregar_lista_fabricantes, descobrir_dispositivos, obter_total_dispositivos_descobertos, obter_rede_local
+# agente_snmp.py
+from pysnmp.hlapi import *
+from main import carregar_lista_fabricantes, descobrir_dispositivos, obter_rede_local
 
 # Estado inicial da ferramenta
 estado_ferramenta = {
@@ -9,35 +10,51 @@ estado_ferramenta = {
     "contato_admin": "admin@exemplo.com"
 }
 
+# Inicializa a variável de dispositivos descobertos
+dispositivos_descobertos = []
+
 # Atualiza a lista de dispositivos descobertos
 def atualizar_dispositivos():
     global dispositivos_descobertos
     lista_fabricantes = carregar_lista_fabricantes('./mac.txt')
     rede_local = obter_rede_local()
     dispositivos_descobertos = descobrir_dispositivos(rede=rede_local, lista_fabricantes=lista_fabricantes)
-    estado_ferramenta["total_dispositivos_descobertos"] = obter_total_dispositivos_descobertos(dispositivos_descobertos)
 
-# Configura o agente SNMP
+# Função para criar e configurar o agente SNMP
 def configurar_agente_snmp():
-    agente = SnmpAgent(
-        host="0.0.0.0",
-        port=161,
-        community="publico"
-    )
+    # Criando o motor SNMP
+    snmp_engine = SnmpEngine()
 
-    agente.add_mib_entry(MIBEntry("1.3.6.1.4.1.888.1.1", lambda oid: estado_ferramenta["status_sistema"]))
-    agente.add_mib_entry(MIBEntry("1.3.6.1.4.1.888.1.2", lambda oid: estado_ferramenta["intervalo_descoberta"]))
-    agente.add_mib_entry(MIBEntry("1.3.6.1.4.1.888.1.3", lambda oid: estado_ferramenta["total_dispositivos_descobertos"]))
-    agente.add_mib_entry(MIBEntry("1.3.6.1.4.1.888.1.4", lambda oid: estado_ferramenta["contato_admin"]))
+    # Adicionando transporte para o SNMP (escutando na porta 161)
+    transport = UdpTransportTarget(('0.0.0.0', 161))
 
+    # Configuração da comunidade SNMP
+    config.addV1System(snmp_engine, 'publico', 'publico')
+
+    # MIB entries principais
+    def add_mib_entry(oid, value):
+        setCmd(
+            snmp_engine,
+            transport,
+            CommunityData('publico'),
+            ContextData(),
+            ObjectType(ObjectIdentity(oid), value)
+        )
+
+    add_mib_entry('1.3.6.1.4.1.888.1.1', estado_ferramenta["status_sistema"])
+    add_mib_entry('1.3.6.1.4.1.888.1.2', estado_ferramenta["intervalo_descoberta"])
+    add_mib_entry('1.3.6.1.4.1.888.1.3', estado_ferramenta["total_dispositivos_descobertos"])
+    add_mib_entry('1.3.6.1.4.1.888.1.4', estado_ferramenta["contato_admin"])
+
+    # Adicionando dispositivos descobertos às MIBs
     for i, dispositivo in enumerate(dispositivos_descobertos, start=1):
-        agente.add_mib_entry(MIBEntry(f"1.3.6.1.4.1.888.1.5.1.{i}.1", lambda oid, d=dispositivo: d["ip"]))
-        agente.add_mib_entry(MIBEntry(f"1.3.6.1.4.1.888.1.5.1.{i}.2", lambda oid, d=dispositivo: d["nome"]))
-        agente.add_mib_entry(MIBEntry(f"1.3.6.1.4.1.888.1.5.1.{i}.3", lambda oid, d=dispositivo: d["status"]))
-        agente.add_mib_entry(MIBEntry(f"1.3.6.1.4.1.888.1.5.1.{i}.4", lambda oid, d=dispositivo: d["uptime"]))
+        add_mib_entry(f"1.3.6.1.4.1.888.1.5.1.{i}.1", dispositivo["ip"])
+        add_mib_entry(f"1.3.6.1.4.1.888.1.5.1.{i}.2", dispositivo["nome"])
+        add_mib_entry(f"1.3.6.1.4.1.888.1.5.1.{i}.3", dispositivo["status"])
+        add_mib_entry(f"1.3.6.1.4.1.888.1.5.1.{i}.4", dispositivo["uptime"])
 
     print("Agente SNMP em execução...")
-    agente.serve_forever()
+    snmp_engine.transportDispatcher.runDispatcher()
 
 if __name__ == "__main__":
     atualizar_dispositivos()
